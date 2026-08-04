@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Brdgr — Interactive Wireframes</title>
+<style>
+  :root{
+    --navy:#1e3a5f; --navy-dark:#16293f; --gold:#92400e; --gold-bg:#fef3c7;
+    --line:#cbd5e1; --bar:#dde3ea; --bar-dark:#c7d0db; --panel:#f7f9fb;
+    --page:#eef1f5; --ink:#1f2937; --muted:#64748b; --white:#fff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--page);color:var(--ink);}
+  .app{display:flex;height:100vh;}
+
+  /* left rail: portal + screen picker */
+  .rail{width:230px;background:var(--navy-dark);color:#cbd5e1;display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+  .rail-head{padding:18px 18px 10px;font-size:19px;font-weight:700;color:#fff;letter-spacing:.3px;}
+  .rail-head span{color:#e8a33d;}
+  .rail-sub{padding:0 18px 14px;font-size:11px;color:#93a3b8;text-transform:uppercase;letter-spacing:.06em;}
+  .portal-group{margin-top:6px;}
+  .portal-label{padding:10px 18px 6px;font-size:11px;font-weight:700;color:#7c92ab;text-transform:uppercase;letter-spacing:.08em;}
+  .screen-btn{display:block;width:100%;text-align:left;background:none;border:none;color:#c9d4e2;padding:9px 18px;font-size:13.5px;cursor:pointer;border-left:3px solid transparent;font-family:inherit;}
+  .screen-btn:hover{background:#20344d;color:#fff;}
+  .screen-btn.active{background:#2a4363;color:#fff;border-left-color:#e8a33d;font-weight:600;}
+  .rail-foot{margin-top:auto;padding:14px 18px;font-size:11px;color:#5f7089;border-top:1px solid #223650;}
+
+  /* main viewport */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;}
+  .browserbar{background:#f1f3f6;border-bottom:1px solid var(--line);padding:9px 16px;display:flex;align-items:center;gap:14px;flex-shrink:0;}
+  .dots{display:flex;gap:6px;}
+  .dots i{width:10px;height:10px;border-radius:50%;background:#b9c2cf;display:block;}
+  .urlbar{flex:1;max-width:520px;background:#fff;border:1px solid var(--line);border-radius:6px;padding:6px 14px;font-size:12.5px;color:#475569;font-weight:600;text-align:center;}
+  .crumb{margin-left:auto;font-size:12px;font-weight:700;color:var(--navy);text-align:right;}
+  .crumb small{display:block;font-weight:500;color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;}
+
+  .stage{flex:1;overflow:auto;padding:22px;}
+  .screen{max-width:1180px;margin:0 auto;}
+  .screen-title{font-size:22px;font-weight:700;color:var(--navy);margin:0 0 2px;}
+  .screen-sub{font-size:12.5px;color:var(--muted);margin:0 0 18px;}
+
+  .region{border:1.5px dashed #b7c2cf;border-radius:8px;padding:14px 16px 16px;margin-bottom:14px;position:relative;background:#fff;}
+  .region-row{display:flex;gap:14px;}
+  .region-row > .region{flex:1;margin-bottom:0;}
+  .region-label{font-size:11px;font-weight:700;letter-spacing:.04em;color:#3b4a5c;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--gold);color:#fff;font-size:11px;font-weight:700;flex-shrink:0;}
+
+  .bar{height:11px;background:var(--bar);border-radius:3px;margin-bottom:8px;}
+  .bar.short{width:35%;} .bar.med{width:60%;} .bar.long{width:88%;} .bar.full{width:100%;}
+  .bar.dark{background:var(--navy);height:15px;width:70%;}
+
+  .card-row{display:flex;gap:12px;flex-wrap:wrap;}
+  .card{flex:1;min-width:110px;background:var(--panel);border-radius:6px;padding:14px;min-height:52px;}
+  .card.kpi{display:flex;flex-direction:column;justify-content:center;gap:6px;}
+
+  .chartwrap{display:flex;align-items:flex-end;gap:10px;height:110px;padding-top:6px;}
+  .chartwrap .col{flex:1;background:var(--bar);border-radius:3px 3px 0 0;}
+
+  .btn{display:inline-block;padding:9px 16px;border-radius:6px;font-size:12.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--navy);}
+  .btn.solid{background:var(--navy);color:#fff;}
+  .btn.outline{background:#fff;color:var(--navy);}
+  .btn.thin{border-color:var(--line);color:var(--navy);}
+  .btnrow{display:flex;gap:10px;flex-wrap:wrap;}
+
+  table.wf{width:100%;border-collapse:collapse;}
+  table.wf td{padding:8px 10px 8px 0;border-bottom:1px solid #eef1f5;}
+  table.wf .cellbar{height:10px;background:var(--bar);border-radius:3px;}
+
+  .steprail{display:flex;gap:6px;margin-bottom:4px;}
+  .step{flex:1;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);padding:8px 4px;border-radius:5px;background:var(--panel);}
+  .step.on{background:var(--navy);color:#fff;}
+
+  .tabrail{display:flex;gap:4px;margin-bottom:12px;border-bottom:1px solid #e5eaf0;}
+  .tabitem{padding:8px 14px;font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;border-bottom:2px solid transparent;}
+  .tabitem.on{color:var(--navy);border-color:var(--navy);}
+
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;background:#e2e8f0;font-size:10.5px;font-weight:700;color:#475569;text-transform:uppercase;}
+  .tag{display:inline-block;padding:3px 9px;border-radius:5px;background:#eef2f6;font-size:10.5px;font-weight:600;color:#475569;margin-right:6px;}
+
+  .note{font-size:11.5px;color:var(--muted);background:var(--panel);border-radius:6px;padding:10px 12px;line-height:1.5;}
+
+  .candcard{border:1px solid #e5eaf0;border-radius:6px;padding:12px 14px;margin-bottom:10px;}
+  .candcard .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);}
+  ::-webkit-scrollbar{width:9px;height:9px;} ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:5px;}
+</style>
+</head>
+<body>
+<span class="sr-only">Interactive clickable wireframe prototype for Brdgr, a partnership marketplace platform, covering all seventeen screens across the public, client, partner, and admin portals.</span>
+<div class="app">
+  <div class="rail">
+    <div class="rail-head">Brdgr<span>.</span></div>
+    <div class="rail-sub">Wireframes — click to navigate</div>
+    <div id="railBody"></div>
+    <div class="rail-foot">Skeletons only — no copy, numbers, or styling. Domain not yet decided.</div>
+  </div>
+  <div class="main">
+    <div class="browserbar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="urlbar" id="urlbar">— (domain not yet decided)</div>
+      <div class="crumb" id="crumb"><small>portal</small>screen</div>
+    </div>
+    <div class="stage"><div class="screen" id="stage"></div></div>
+  </div>
+</div>
+<script>
+const B = n => `<span class="badge">${n}</span>`;
+const bars = (n=3, pattern=['long','med','short']) => Array.from({length:n}).map((_,i)=>`<div class="bar ${pattern[i%pattern.length]}"></div>`).join('');
+const region = (label, badge, inner, extra='') => `<div class="region" style="${extra}"><div class="region-label">${badge?B(badge):''}${label}</div>${inner}</div>`;
+const cards = (n, opts={}) => `<div class="card-row">${Array.from({length:n}).map(()=>`<div class="card ${opts.kpi?'kpi':''}" style="${opts.h?`min-height:${opts.h}px`:''}">${opts.kpi?bars(1,['short'])+'<div class="bar dark"></div>':''}</div>`).join('')}</div>`;
+const chart = (n=10)=>`<div class="chartwrap">${Array.from({length:n}).map(()=>`<div class="col" style="height:${20+Math.random()*80}px"></div>`).join('')}</div>`;
+const table = (rows=4, cols=5)=>`<table class="wf">${Array.from({length:rows}).map(()=>`<tr>${Array.from({length:cols}).map(()=>`<td><div class="cellbar" style="width:${50+Math.random()*40}%"></div></td>`).join('')}</tr>`).join('')}</table>`;
+const steprail = (steps, activeIdx)=>`<div class="steprail">${steps.map((s,i)=>`<div class="step ${i===activeIdx?'on':''}">${s}</div>`).join('')}</div>`;
+const tabrail = (tabs, activeIdx)=>`<div class="tabrail">${tabs.map((t,i)=>`<div class="tabitem ${i===activeIdx?'on':''}">${t}</div>`).join('')}</div>`;
+const btn = (label, cls='solid', to)=>`<span class="btn ${cls}" ${to?`onclick="go('${to}')"`:''}>${label}</span>`;
+const candCard = (tags)=>`<div class="candcard"><div class="top"><span class="pill">vetted</span><div>${btn('accept','solid')} ${btn('decline','outline')}</div></div><div style="margin-bottom:8px">${tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>${bars(2,['long','med'])}</div>`;
+
+function sidebarNav(items, activeId){
+  return `<div style="width:150px;flex-shrink:0;padding-right:16px;border-right:1px solid #eef1f5;margin-right:4px;">
+    ${items.map(it=>`<div style="padding:9px 10px;font-size:12px;font-weight:${it.id===activeId?'700':'500'};color:${it.id===activeId?'#fff':'#475569'};background:${it.id===activeId?'var(--navy)':'transparent'};border-radius:5px;margin-bottom:3px;">${it.label}</div>`).join('')}
+  </div>`;
+}
+
+const PORTAL_NAV = {
+  client: [['dashboard','Dashboard'],['brief','New brief'],['proposals','Match proposals'],['detail','Partnership'],['onboard','Onboard partners'],['billing','Plan & billing']],
+  partner: [['pvet','Sign-up & vetting'],['pdash','Dashboard'],['poffers','Offers'],['pearn','Earnings & statements']],
+  admin: [['queue','Work queue'],['vetreview','Vetting review'],['matchbuilder','Match builder'],['payout','Payout manifest']],
+};
+function portalRail(portal, activeId){
+  const items = PORTAL_NAV[portal].map(([id,label])=>({id,label}));
+  return sidebarNav(items, activeId);
+}
+
+const SCREENS = {
+
+landing: { portal:'public', title:'Public — landing page', sub:'skeleton — every price and share remains until decided', body: () => `
+  ${region('Hero + dual CTA','1', `${bars(1,['dark'])}${bars(2,['long','med'])}<div class="btnrow" style="margin-top:10px">${btn('CTA — for companies','solid','signup')}${btn('CTA — for growth partners','outline','signup')}</div>`)}
+  <div class="region-row">
+    ${region('Problem — companies', null, bars(3,['long','med','long']))}
+    ${region('Problem — partners', null, bars(3,['long','med','long']))}
+  </div>
+  ${region('How it works — the five-step engine','2', `<div class="card-row">${Array.from({length:5}).map(()=>`<div class="card" style="min-height:56px"></div>`).join('')}</div>${bars(1,['med'])}`)}
+  <div class="region-row">
+    ${region('Two ways in — supplied / bring your own','3', bars(3,['long','med','short']))}
+    ${region('Ecosystems — trading current; roadmap', null, bars(2,['long','med']))}
+  </div>
+  ${region('Footer — legal · policies · sign in','4', `<div class="card-row">${Array.from({length:4}).map(()=>`<div class="card" style="min-height:22px"></div>`).join('')}</div>`)}
+`},
+
+signin: { portal:'public', title:'Public — sign in', sub:'one door in, then two paths', body: () => `
+  ${region('Sign-in form','1', `${bars(2,['med','med'])}<div style="margin-top:10px">${btn('sign in','solid','')}</div>`)}
+  ${region('Second factor','2', `<div class="note">Supported for all, mandatory for Operations Administrators.</div>`)}
+  ${region('Sign-up routing','3', `<div class="btnrow">${btn('sign up — company','thin','signup')}${btn('sign up — partner','thin','signup')}</div>`)}
+`},
+
+signup: { portal:'public', title:'Public — sign up', sub:'choose a side, then branch', body: () => `
+  ${region('Step rail','1', steprail(['side','account','path','verify'],1))}
+  ${region('Role selection + account','2', bars(2,['med','long']))}
+  <div class="region-row">
+    ${region('Company path','3', `${bars(2,['long','med'])}<div class="note" style="margin-top:8px">Plan selection (prices —) and the free trial start — billing begins when the trial ends.</div>`)}
+    ${region('Partner path + rules','4', `${bars(2,['long','med'])}<div class="note" style="margin-top:8px">Profile then the vetting queue. Trial then billing; no permanent free plan; nobody matchable before vetting.</div>`)}
+  </div>
+  <div class="btnrow">${btn('continue — company','solid','dashboard')}${btn('continue — partner','outline','pvet')}</div>
+`},
+
+dashboard: { portal:'client', navid:'dashboard', title:'Client — dashboard', sub:'skeleton — every figure binds to ledger & event data', body: () => `
+  ${region('Band — live partnerships · clicks · conversions · confirmed cost (USD)','1', cards(4,{kpi:true}))}
+  <div class="region-row">
+    ${region('Chart — conversions by partnership','2', chart(10))}
+    ${region('Attention — proposals awaiting review','3', `${bars(3,['long','med','long'])}<div style="margin-top:8px">${btn('open proposals','outline','proposals')}</div>`)}
+  </div>
+  ${region('Table — partnerships: state · volume · confirmed · entry to detail','4', table(4,5))}
+`},
+
+brief: { portal:'client', navid:'brief', title:'Client — new brief', sub:'a brief is structured, not a free-text wish', body: () => `
+  ${region('Step rail','1', steprail(['objective','audience','model','constraints','review'],2))}
+  <div class="region-row">
+    ${region('Commission model stage','2', `${bars(3,['med','long','med'])}<div class="note" style="margin-top:8px">Model, paying conversion, amount, and confirmation rule — configuration-driven.</div>`)}
+    ${region('Brief summary','3', bars(4,['long','med','long','short']))}
+  </div>
+  ${region('Limits note','4', `<div class="note">Proposal volume follows plan configuration; restricted territories enforced at matching and the fraud gate.</div>`)}
+  <div class="btnrow">${btn('save draft','thin','')}${btn('submit brief','solid','proposals')}</div>
+`},
+
+proposals: { portal:'client', navid:'proposals', title:'Client — match proposals', sub:'vetted candidates, anonymised until contract', body: () => `
+  ${region('Anonymised candidate cards','1', candCard(['engaged audience','on-brand','fast response'])+candCard(['high volume','repeat performer'])+candCard(['new to platform','niche audience']))}
+  ${region('Gating note','2', `<div class="note">Identity and channels are withheld until the ACCEPTED → CONTRACTED transition, after both signatures.</div>`)}
+  ${region('Proposal terms','3', `<table class="wf">${['model','amount','territories','exclusivity window'].map(l=>`<tr><td style="width:160px;font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase">${l}</td><td><div class="cellbar" style="width:60%"></div></td></tr>`).join('')}</table>`)}
+  <div class="btnrow">${btn('view partnership','solid','detail')}</div>
+`},
+
+detail: { portal:'client', navid:'detail', title:'Client — partnership detail', sub:'one record, whole life', body: () => `
+  ${region('Tab rail','1', tabrail(['overview','contract','tracking','commissions','messages'],0))}
+  <div class="region-row">
+    ${region('State + timeline','2', `<span class="pill">contracted</span>${bars(3,['long','med','short'])}`)}
+    ${region('Commission summary','5', cards(3,{kpi:true}))}
+  </div>
+  <div class="region-row">
+    ${region('Contract access','3', `${bars(1,['med'])}<div style="margin-top:8px">${btn('download contract','thin','')}</div>`)}
+    ${region('Actions','4', `<div class="btnrow">${btn('pause','outline','')}${btn('request re-match','outline','')}</div>`)}
+  </div>
+`},
+
+billing: { portal:'client', navid:'billing', title:'Client — plan & billing', sub:'no permanent free plan', body: () => `
+  ${region('Current plan','1', bars(2,['med','long']))}
+  ${region('Plan cards','2', `<div class="card-row">${['starter','growth','enterprise'].map(p=>`<div class="card" style="min-height:90px"><div class="pill" style="margin-bottom:8px">${p}</div>${bars(2,['long','med'])}</div>`).join('')}</div>`)}
+  <div class="region-row">
+    ${region('Invoices','3', table(3,3))}
+    ${region('Failure note','4', `<div class="note">Failed payments retry and notify before the account locks read-only.</div>`)}
+  </div>
+`},
+
+onboard: { portal:'client', navid:'onboard', title:'Client — onboard your partners', sub:'the option that meets companies where they are', body: () => `
+  <div class="region-row">
+    ${region('Single invitation','1', `${bars(2,['med','long'])}<div style="margin-top:8px">${btn('send invite','solid','')}</div>`)}
+    ${region('Bulk invitation','2', `${bars(1,['long'])}<div style="margin-top:8px">${btn('upload CSV','outline','')}</div>`)}
+  </div>
+  ${region('Invitation pipeline','3', `<div class="steprail">${['invited','signed up','verifying','contracted','live'].map(s=>`<div class="step">${s}</div>`).join('')}</div>`)}
+  ${region('Ownership & verification notes','4', `<div class="note">Non-circumvention never applies to partners the client brought. Invited partners pass identity-and-compliance checks only — full vetting applies only if they opt into open matching.</div>`)}
+`},
+
+pvet: { portal:'partner', navid:'pvet', title:'Partner — sign-up & vetting status', sub:'the honest waiting room', body: () => `
+  ${region('Progress rail','1', steprail(['profile submitted','under review','outcome'],1))}
+  ${region('Review dimensions','2', `<div class="card-row">${['audience authenticity','compliance history','track record'].map(d=>`<div class="card"><div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:8px">${d}</div><span class="pill">in review</span></div>`).join('')}</div>`)}
+  <div class="region-row">
+    ${region('Evidence request','3', bars(2,['long','med']))}
+    ${region('Rules panel','4', `<div class="note">Re-application after decline is possible. Payout details never reach clients.</div>`)}
+  </div>
+`},
+
+pdash: { portal:'partner', navid:'pdash', title:'Partner — dashboard', sub:'what am I earning, and what should I do next?', body: () => `
+  ${region('Money-state cards','1', `<div class="card-row">${['pending review','confirmed','scheduled','paid'].map(s=>`<div class="card kpi"><div class="pill" style="margin-bottom:6px">${s}</div><div class="bar dark"></div></div>`).join('')}</div>`)}
+  ${region('Per-partnership table','2', table(4,4))}
+  <div class="region-row">
+    ${region('Link panel','3', `${bars(1,['long'])}<div style="margin-top:8px">${btn('copy link','thin','')}</div>`)}
+    ${region('Attribution note','4', `<div class="note">Attribution happens on our servers, not the visitor's browser — credit survives ad blockers.</div>`)}
+  </div>
+`},
+
+poffers: { portal:'partner', navid:'poffers', title:'Partner — offers', sub:'programmes come to the partner', body: () => `
+  ${region('Offer card','1', candCard(['on-brand fit','audience match']))}
+  ${region('Terms table','2', `<table class="wf">${['what pays','amount to partner','response window'].map(l=>`<tr><td style="width:160px;font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase">${l}</td><td><div class="cellbar" style="width:55%"></div></td></tr>`).join('')}</table>`)}
+  <div class="region-row">
+    ${region('Accept / decline','3', `<div class="btnrow">${btn('accept','solid','pearn')}${btn('decline','outline','')}</div>`)}
+    ${region('Gating & messaging note','4', `<div class="note">Contact releases only at contract. Pre-contract questions go through platform messages.</div>`)}
+  </div>
+`},
+
+pearn: { portal:'partner', navid:'pearn', title:'Partner — earnings & statements', sub:'the screen the motto answers to', body: () => `
+  ${region('Next payout','1', `${cards(1,{kpi:true})}<div class="note" style="margin-top:8px">Executed by the fifth business day; minimum applies (—).</div>`)}
+  ${region('Statement export','2', `<div class="btnrow">${btn('export CSV','thin','')}${btn('export PDF','thin','')}</div>`)}
+  ${region('Itemised lines','3', table(5,4))}
+  ${region('Disputes note','4', `<div class="note">Every deduction carries a reason; disputes attach the full trace.</div>`)}
+`},
+
+queue: { portal:'admin', navid:'queue', title:'Admin — work queue', sub:"the console's front page: everything waiting, oldest and riskiest first", body: () => `
+  ${region('Queue counters','1', cards(4,{kpi:true}))}
+  ${region('Unified list','2', table(5,4))}
+  <div class="region-row">
+    ${region('Held commission entry','3', bars(2,['med','long']))}
+    ${region('Private metrics note','4', `<div class="note">Service metrics record privately first — published only when they can be stood behind.</div>`)}
+  </div>
+`},
+
+vetreview: { portal:'admin', navid:'vetreview', title:'Admin — vetting review', sub:'careful made fast', body: () => `
+  <div class="region-row">
+    ${region('Evidence panel','1', bars(4,['long','med','long','short']))}
+    ${region('Dimension verdicts','2', `<div class="card-row">${['audience authenticity','compliance history','track record'].map(d=>`<div class="card"><div style="font-size:10.5px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px">${d}</div><span class="pill">pass</span></div>`).join('')}</div>`)}
+  </div>
+  ${region('Audited notes','3', bars(2,['long','med']))}
+  ${region('Outcomes','4', `<div class="btnrow">${btn('approve','solid','')}${btn('request info','thin','')}${btn('decline','outline','')}</div>`)}
+`},
+
+matchbuilder: { portal:'admin', navid:'matchbuilder', title:'Admin — match builder', sub:'where matching actually happens', body: () => `
+  <div class="region-row">
+    ${region('Brief panel','1', bars(4,['long','med','long','short']))}
+    ${region('Ranked candidates','2', candCard(['score 92','fit: audience'])+candCard(['score 87','fit: territory']))}
+  </div>
+  <div class="region-row">
+    ${region('Approve & send','3', `<div class="btnrow">${btn('approve & send','solid','')}</div>`)}
+    ${region('Filter note','4', `<div class="note">Restricted territories and exclusivity windows filter candidates before ranking ever runs.</div>`)}
+  </div>
+`},
+
+payout: { portal:'admin', navid:'payout', title:'Admin — payout manifest', sub:'the accountable moment', body: () => `
+  ${region('Run summary','1', cards(3,{kpi:true}))}
+  ${region('Ledger check','2', `<div class="note">Balance invariants verified before approval is even offered.</div><div style="margin-top:8px"><span class="pill">balanced</span></div>`)}
+  ${region('Line detail','3', table(5,5))}
+  ${region('Approve & execute','4', `<div class="btnrow">${btn('approve & execute','solid','')}</div>`)}
+`},
+
+};
+
+const RAIL_GROUPS = [
+  {label:'Public', items:[['landing','Landing page'],['signin','Sign in'],['signup','Sign up']]},
+  {label:'Client portal', items:[['dashboard','Dashboard'],['brief','New brief'],['proposals','Match proposals'],['detail','Partnership detail'],['onboard','Onboard partners'],['billing','Plan & billing']]},
+  {label:'Partner portal', items:[['pvet','Sign-up & vetting'],['pdash','Dashboard'],['poffers','Offers'],['pearn','Earnings & statements']]},
+  {label:'Admin console', items:[['queue','Work queue'],['vetreview','Vetting review'],['matchbuilder','Match builder'],['payout','Payout manifest']]},
+];
+
+function renderRail(activeId){
+  document.getElementById('railBody').innerHTML = RAIL_GROUPS.map(g=>`
+    <div class="portal-group">
+      <div class="portal-label">${g.label}</div>
+      ${g.items.map(([id,label])=>`<button class="screen-btn ${id===activeId?'active':''}" onclick="go('${id}')">${label}</button>`).join('')}
+    </div>
+  `).join('');
+}
+
+function go(id){
+  const s = SCREENS[id];
+  if(!s) return;
+  renderRail(id);
+  document.getElementById('urlbar').textContent = '— (domain not yet decided)';
+  document.getElementById('crumb').innerHTML = `<small>${s.portal} portal</small>${s.title.split('—')[1]||s.title}`;
+  let content = '';
+  if(s.portal!=='public'){
+    content += `<div style="display:flex;gap:0"> ${portalRail(s.portal, s.navid)} <div style="flex:1;min-width:0">
+      <h2 class="screen-title">${s.title}</h2><p class="screen-sub">${s.sub}</p>
+      ${s.body()}
+    </div></div>`;
+  } else {
+    content += `<h2 class="screen-title">${s.title}</h2><p class="screen-sub">${s.sub}</p>${s.body()}`;
+  }
+  document.getElementById('stage').innerHTML = content;
+  document.getElementById('stage').scrollIntoView();
+  window.scrollTo(0,0);
+  document.querySelector('.stage').scrollTop = 0;
+}
+go('landing');
+</script>
+</body>
+</html>
